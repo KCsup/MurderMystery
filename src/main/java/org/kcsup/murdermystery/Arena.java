@@ -8,6 +8,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.kcsup.murdermystery.kits.Kit;
 import org.kcsup.murdermystery.kits.KitType;
+import org.kcsup.murdermystery.kits.types.Detective;
+import org.kcsup.murdermystery.kits.types.Innocent;
+import org.kcsup.murdermystery.kits.types.Murderer;
 import org.kcsup.murdermystery.kits.types.Test;
 
 import java.util.ArrayList;
@@ -138,13 +141,22 @@ public class Arena {
             case TEST:
                 kits.put(uuid, new Test(uuid));
                 break;
+            case MURDERER:
+                kits.put(uuid, new Murderer(uuid));
+                break;
+            case DETECTIVE:
+                kits.put(uuid, new Detective(uuid));
+                break;
+            case INNOCENT:
+                kits.put(uuid, new Innocent(uuid));
+                break;
             default:
                 return;
         }
     }
 
     //---
-    private HashMap<String, ItemStack[]> mySavedItems = new HashMap<String, ItemStack[]>();
+    private HashMap<String, ItemStack[]> mySavedItems = new HashMap<>();
 
     public void saveInventory(Player player)
     {

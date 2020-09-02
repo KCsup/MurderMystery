@@ -21,11 +21,15 @@ public class GameListener implements Listener {
 
     @EventHandler
     public void onMobKill(EntityDeathEvent e) {
-        Player player = e.getEntity().getKiller();
+        try{
+            Player player = (Player) e.getEntity().getKiller();
 
-        if(Manager.isPlaying(player) && Manager.getArena(player).getState().equals(GameState.LIVE)) {
-            Manager.getArena(player).getGame().addPoint(player);
-            player.sendMessage(ChatColor.GREEN + "+1 Point!");
+            if(Manager.isPlaying(player) && Manager.getArena(player).getState().equals(GameState.LIVE)) {
+                Manager.getArena(player).getGame().addPoint(player);
+                player.sendMessage(ChatColor.GREEN + "+1 Point!");
+            }
+        } catch (NullPointerException x) {
+
         }
     }
 
