@@ -16,7 +16,7 @@ public class Main extends JavaPlugin {
 
         new Manager();
 
-        getCommand("arena").setExecutor(new ArenaCommand());
+        getCommand("mm").setExecutor(new ArenaCommand());
 
         Bukkit.getPluginManager().registerEvents(new GameListener(),this);
     }

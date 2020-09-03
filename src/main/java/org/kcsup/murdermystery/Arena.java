@@ -1,17 +1,10 @@
 package org.kcsup.murdermystery;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.kcsup.murdermystery.kits.Kit;
 import org.kcsup.murdermystery.kits.KitType;
-import org.kcsup.murdermystery.kits.types.Detective;
-import org.kcsup.murdermystery.kits.types.Innocent;
-import org.kcsup.murdermystery.kits.types.Murderer;
-import org.kcsup.murdermystery.kits.types.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,37 +15,44 @@ public class Arena {
 
     private int id;
     private ArrayList<UUID> players;
-    private HashMap<UUID, Kit> kits;
+    private HashMap<UUID, KitType> kits;
     private Location spawn;
     private GameState state;
     private Countdown countdown;
+    private MurdererCountdown murdererCountdown;
     private Game game;
 
     public Arena(int id) {
         this.id = id;
         players = new ArrayList<>();
-        kits = new HashMap<>();
+        kits = new HashMap<UUID, KitType>();
         spawn = Config.getArenaSpawn(id);
         state = GameState.RECRUITING;
         countdown = new Countdown(this);
+        murdererCountdown = new MurdererCountdown(this);
         game = new Game(this);
     }
 
     public void start() {
         game.start();
+        murdererCountdown.begin();
     }
 
     public void reset() {
         for (UUID uuid : players) {
             removeKit(uuid);
+            game.removeBowStand();
             Bukkit.getPlayer(uuid).teleport(Config.getLobbySpawn());
             Bukkit.getPlayer(uuid).getInventory().clear();
             restoreInventory(Bukkit.getPlayer(uuid));
+            restoreGameMode(Bukkit.getPlayer(uuid));
+            game.kills.keySet().clear();
         }
 
         state = GameState.RECRUITING;
         players.clear();
         countdown = new Countdown(this);
+        murdererCountdown = new MurdererCountdown(this);
         game = new Game(this);
     }
 
@@ -71,12 +71,26 @@ public class Arena {
         }
     }
 
+    public void sendTitle(String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        for (UUID uuid : players) {
+            Bukkit.getPlayer(uuid).sendTitle(title,subtitle,fadeIn,stay,fadeOut);
+        }
+    }
+
+    public void sendSound(Sound sound, SoundCategory category, float volume, float pitch) {
+        for (UUID uuid : players) {
+            Bukkit.getPlayer(uuid).playSound(Bukkit.getPlayer(uuid).getLocation(),sound, category, volume, pitch);
+        }
+    }
+
     public void addPlayer(Player player) {
         players.add(player.getUniqueId());
         player.teleport(spawn);
         sendMessage(ChatColor.GREEN + player.getName() + " has joined!");
         saveInventory(player);
+        saveGameMode(player);
         player.getInventory().clear();
+        player.setGameMode(GameMode.SURVIVAL);
 
         if (players.size() >= Config.getRequiredPlayers()) {
             countdown.begin();
@@ -87,10 +101,17 @@ public class Arena {
         players.remove(player.getUniqueId());
         player.teleport(Config.getLobbySpawn());
 
+        if (getKits().get(player.getUniqueId()).equals(KitType.MURDERER) &&
+                state.equals(GameState.LIVE)) {
+            sendMessage(ChatColor.GOLD + "The innocents win! The murderer quit!");
+            murdererCountdown.cancel();
+            reset();
+        }
         removeKit(player.getUniqueId());
 
         player.getInventory().clear();
         restoreInventory(player);
+        restoreGameMode(player);
 
         sendMessage(ChatColor.GREEN + player.getName() + " has quit!");
 
@@ -111,7 +132,7 @@ public class Arena {
         return players;
     }
 
-    public HashMap<UUID, Kit> getKits() {
+    public HashMap<UUID, KitType> getKits() {
         return kits;
     }
 
@@ -129,7 +150,6 @@ public class Arena {
 
     public void removeKit(UUID uuid) {
         if (kits.containsKey(uuid)) {
-            kits.get(uuid).remove();
             kits.remove(uuid);
         }
     }
@@ -138,17 +158,14 @@ public class Arena {
         removeKit(uuid);
 
         switch (type) {
-            case TEST:
-                kits.put(uuid, new Test(uuid));
-                break;
             case MURDERER:
-                kits.put(uuid, new Murderer(uuid));
+                kits.put(uuid, KitType.MURDERER);
                 break;
             case DETECTIVE:
-                kits.put(uuid, new Detective(uuid));
+                kits.put(uuid, KitType.DETECTIVE);
                 break;
             case INNOCENT:
-                kits.put(uuid, new Innocent(uuid));
+                kits.put(uuid, KitType.INNOCENT);
                 break;
             default:
                 return;
@@ -190,5 +207,42 @@ public class Arena {
     {
         p.getInventory().setContents(inventory);
     }
+
+    //---
+
+    private HashMap<String, GameMode> mySavedGameMode = new HashMap<>();
+
+    public void saveGameMode(Player player)
+    {
+        this.mySavedGameMode.put(player.getName(), copyGameMode(player.getGameMode()));
+    }
+
+    /**
+     * This removes the saved inventory from our HashMap, and restores it to the player if it existed.
+     * @return true iff success
+     */
+    public boolean restoreGameMode(Player player)
+    {
+        GameMode savedGameMode = this.mySavedGameMode.remove(player.getName());
+        if(savedGameMode == null)
+            return false;
+        restoreGameMode(player,savedGameMode);
+        return true;
+    }
+
+    private GameMode copyGameMode(GameMode gm)
+    {
+        GameMode original = gm;
+        GameMode copy = null;
+        if(original != null)
+            copy = original;
+        return copy;
+    }
+
+    private void restoreGameMode(Player p, GameMode gamemode)
+    {
+        p.setGameMode(gamemode);
+    }
+    //---
 
 }

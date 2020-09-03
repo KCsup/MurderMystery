@@ -37,24 +37,24 @@ public class ArenaCommand implements CommandExecutor {
                             if(Manager.isRecruiting(id) || Manager.isCountingDown(id)) {
                                 Manager.getArena(id).addPlayer(player);
 
-                                player.sendMessage(ChatColor.GREEN + "You are now playing in arena " + id + "!");
+                                player.sendMessage(ChatColor.GREEN + "You are now playing in murder mystery, arena " + id + "!");
                             } else {
                                 player.sendMessage(ChatColor.RED + "This game is currently live!");
                             }
                         } else {
                             player.sendMessage(ChatColor.RED + "Invalid arena!");
-                            player.sendMessage(ChatColor.RED + "See: /arena list for available arenas.");
+                            player.sendMessage(ChatColor.RED + "See: /mm list for available arenas.");
                         }
                     } catch (NumberFormatException x) {
                         player.sendMessage(ChatColor.RED + "Invalid arena!");
-                        player.sendMessage(ChatColor.RED + "See: /arena list for available arenas.");
+                        player.sendMessage(ChatColor.RED + "See: /mm list for available arenas.");
                     }
                 }
             } else {
                 player.sendMessage(ChatColor.RED + "Invalid usage. Correct usage is:");
-                player.sendMessage(ChatColor.RED + "- /arena list");
-                player.sendMessage(ChatColor.RED + "- /arena join [id]");
-                player.sendMessage(ChatColor.RED + "- /arena leave");
+                player.sendMessage(ChatColor.RED + "- /mm list");
+                player.sendMessage(ChatColor.RED + "- /mm join [id]");
+                player.sendMessage(ChatColor.RED + "- /mm leave");
 
             }
         } else {

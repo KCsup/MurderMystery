@@ -4,4 +4,4 @@ main: org.kcsup.murdermystery.Main
 api-version: 1.16
 description: A fun murder mystery mini-game for you and your friends
 commands:
-  arena:
+  mm:

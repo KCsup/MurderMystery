@@ -4,11 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.kcsup.murdermystery.Main;
 
 import java.util.UUID;
 
-public abstract class Kit implements Listener {
+public class Kit {
 
     protected UUID uuid;
     protected KitType type;
@@ -16,17 +17,14 @@ public abstract class Kit implements Listener {
     public Kit(UUID uuid, KitType type) {
         this.uuid = uuid;
         this.type = type;
-
-        Bukkit.getPluginManager().registerEvents(this, Main.getInstance());
     }
 
     public UUID getUUID() { return uuid; }
     public KitType getType() { return type; }
 
-    public abstract void onStart(Player player);
 
     public void remove() {
-        HandlerList.unregisterAll(this);
+        // HandlerList.unregisterAll(this);
     }
 
 }
