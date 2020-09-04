@@ -41,12 +41,12 @@ public class Arena {
     public void reset() {
         for (UUID uuid : players) {
             removeKit(uuid);
-            game.removeBowStand();
             Bukkit.getPlayer(uuid).teleport(Config.getLobbySpawn());
             Bukkit.getPlayer(uuid).getInventory().clear();
             restoreInventory(Bukkit.getPlayer(uuid));
             restoreGameMode(Bukkit.getPlayer(uuid));
             game.kills.keySet().clear();
+
         }
 
         state = GameState.RECRUITING;
@@ -54,6 +54,9 @@ public class Arena {
         countdown = new Countdown(this);
         murdererCountdown = new MurdererCountdown(this);
         game = new Game(this);
+
+        Bukkit.unloadWorld(spawn.getWorld().getName(),false);
+        spawn = Config.getArenaSpawn(id);
     }
 
     public void resetCountdown() {

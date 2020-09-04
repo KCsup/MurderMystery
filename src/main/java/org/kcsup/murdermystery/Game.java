@@ -80,14 +80,16 @@ public class Game {
         }
     }
 
-    public void removeBowStand() {
+     /* public void removeBowStand() {
         Player player = Bukkit.getPlayer(uuidMurderer);
         Location location = player.getLocation();
-        for(Entity entity : location.getWorld().getEntities()) {
+        for(Entity entity : Bukkit.getWorld(uuidMurderer).getEntities()) {
             if(entity.getType().equals(EntityType.ARMOR_STAND) && entity.getCustomName().equals("DETECTIVE'S BOW")) {
                 entity.remove();
             }
         }
-    }
+
+
+    } */
 
 }

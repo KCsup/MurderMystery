@@ -15,6 +15,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.kcsup.murdermystery.kits.KitType;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -44,13 +45,13 @@ public class GameListener implements Listener {
                             Manager.getArena(player).sendTitle(ChatColor.YELLOW + "Bow dropped!", "",
                                     10, 50, 20);
 
-                            ArmorStand bowStand = (ArmorStand) victim.getLocation().getWorld().spawnEntity(victim.getLocation(), EntityType.ARMOR_STAND);
-                            bowStand.setGravity(false);
-                            bowStand.setInvulnerable(true);
-                            bowStand.setCustomName("DETECTIVE'S BOW");
-                            bowStand.setVisible(false);
-                            bowStand.setCanMove(false);
-                            bowStand.setItemInHand(new ItemStack(Material.BOW));
+                                ArmorStand bowStand = (ArmorStand) victim.getLocation().getWorld().spawnEntity(victim.getLocation(), EntityType.ARMOR_STAND);
+                                bowStand.setGravity(false);
+                                bowStand.setInvulnerable(true);
+                                bowStand.setCustomName("DETECTIVE'S BOW");
+                                bowStand.setVisible(false);
+                                bowStand.setCanMove(false);
+                                bowStand.setItemInHand(new ItemStack(Material.BOW));
 
                         }
                         if (Manager.getArena(player).getKits().get(victim.getUniqueId()).equals(KitType.INNOCENT) &&
@@ -58,13 +59,13 @@ public class GameListener implements Listener {
                             Manager.getArena(player).sendTitle(ChatColor.YELLOW + "Bow dropped!", "",
                                     10, 50, 20);
 
-                            ArmorStand bowStand = (ArmorStand) victim.getLocation().getWorld().spawnEntity(victim.getLocation(), EntityType.ARMOR_STAND);
-                            bowStand.setGravity(false);
-                            bowStand.setInvulnerable(true);
-                            bowStand.setCustomName("DETECTIVE'S BOW");
-                            bowStand.setVisible(false);
-                            bowStand.setCanMove(false);
-                            bowStand.setItemInHand(new ItemStack(Material.BOW));
+                                ArmorStand bowStand = (ArmorStand) victim.getLocation().getWorld().spawnEntity(victim.getLocation(), EntityType.ARMOR_STAND);
+                                bowStand.setGravity(false);
+                                bowStand.setInvulnerable(true);
+                                bowStand.setCustomName("DETECTIVE'S BOW");
+                                bowStand.setVisible(false);
+                                bowStand.setCanMove(false);
+                                bowStand.setItemInHand(new ItemStack(Material.BOW));
 
                         }
                         victim.sendTitle(ChatColor.RED + "You died!",
@@ -149,6 +150,38 @@ public class GameListener implements Listener {
                     }
                 }
 
+            }
+        }
+    }
+
+    HashMap<Player,Long> cooldown = new HashMap<>();
+
+    @EventHandler
+    public void onBowShoot(EntityShootBowEvent e) {
+        if (e.getEntity() instanceof Player) {
+            Player shooter = (Player) e.getEntity();
+            if (Manager.isPlaying(shooter) && Manager.getArena(shooter).getState().equals(GameState.LIVE)) {
+                if (Manager.getArena(shooter).getKits().get(shooter.getUniqueId()).equals(KitType.DETECTIVE) ||
+                        Manager.getArena(shooter).getKits().get(shooter.getUniqueId()).equals(KitType.INNOCENT)) {
+                    if (cooldown.containsKey(shooter) && cooldown.get(shooter) > System.currentTimeMillis()) {
+                        e.setCancelled(true);
+
+                        long longRemaining = cooldown.get(shooter) - System.currentTimeMillis();
+                        int intRemaining = (int) (longRemaining / 1000);
+
+                        if(intRemaining == 0) {
+                            cooldown.remove(shooter);
+                            shooter.sendMessage(ChatColor.GREEN + "You may shoot again!");
+                        } else if(intRemaining == 1) {
+                            shooter.sendMessage(ChatColor.RED + "You must wait 1 second to shoot again.");
+                        } else {
+                            shooter.sendMessage(ChatColor.RED + "You must wait " + intRemaining + " seconds to shoot again.");
+                        }
+
+                    } else {
+                        cooldown.put(shooter,System.currentTimeMillis() + (5 * 1000));
+                    }
+                }
             }
         }
     }

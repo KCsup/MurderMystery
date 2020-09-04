@@ -2,6 +2,8 @@ package org.kcsup.murdermystery;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 
 public class Config {
 
@@ -29,8 +31,11 @@ public class Config {
     }
 
     public static Location getArenaSpawn(int id) {
+        World world = Bukkit.createWorld(new WorldCreator(main.getConfig().getString("arenas." + id + ".world")));
+        world.setAutoSave(false);
+
         return new Location(
-                Bukkit.getWorld(main.getConfig().getString("arenas." + id + ".world")),
+                world,
                 main.getConfig().getDouble("arenas." + id + ".x"),
                 main.getConfig().getDouble("arenas." + id + ".y"),
                 main.getConfig().getDouble("arenas." + id + ".z"),
