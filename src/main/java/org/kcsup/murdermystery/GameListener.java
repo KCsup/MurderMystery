@@ -11,6 +11,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.kcsup.murdermystery.kits.KitType;
@@ -208,6 +209,14 @@ public class GameListener implements Listener {
                 }
             }
         } */
+    }
+
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent e) {
+        World world = e.getWorld();
+        if(Manager.isArenaWorld(world)) {
+            Manager.getArena(world).setJoinState(true);
+        }
     }
 
     @EventHandler

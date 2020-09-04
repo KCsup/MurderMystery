@@ -1,5 +1,6 @@
 package org.kcsup.murdermystery;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -49,5 +50,23 @@ public class Manager {
     public static boolean isRecruiting(int id) { return getArena(id).getState() == GameState.RECRUITING; }
 
     public static boolean isCountingDown(int id) { return getArena(id).getState() == GameState.COUNTDOWN; }
+
+    public static boolean isArenaWorld(World world) {
+        for(Arena arena : arenas) {
+            if(arena.getSpawn().getWorld().getName().contentEquals(world.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Arena getArena(World world) {
+        for(Arena arena : arenas) {
+            if(arena.getSpawn().getWorld().getName().contentEquals(world.getName())) {
+                return arena;
+            }
+        }
+        return null;
+    }
 
 }

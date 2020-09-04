@@ -22,6 +22,8 @@ public class Arena {
     private MurdererCountdown murdererCountdown;
     private Game game;
 
+    private boolean canJoin;
+
     public Arena(int id) {
         this.id = id;
         players = new ArrayList<>();
@@ -31,6 +33,8 @@ public class Arena {
         countdown = new Countdown(this);
         murdererCountdown = new MurdererCountdown(this);
         game = new Game(this);
+
+        canJoin = true;
     }
 
     public void start() {
@@ -56,6 +60,7 @@ public class Arena {
         game = new Game(this);
 
         Bukkit.unloadWorld(spawn.getWorld().getName(),false);
+        canJoin = false;
         spawn = Config.getArenaSpawn(id);
     }
 
@@ -147,9 +152,18 @@ public class Arena {
         return game;
     }
 
+    public Location getSpawn() {
+        return spawn;
+    }
+
+    public boolean canJoin() { return canJoin; }
+
+
     public void setState(GameState state) {
         this.state = state;
     }
+
+    public void setJoinState(boolean state) { this.canJoin = state; }
 
     public void removeKit(UUID uuid) {
         if (kits.containsKey(uuid)) {
