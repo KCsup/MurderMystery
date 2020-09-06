@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
@@ -134,23 +135,25 @@ public class GameListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent e) {
         Player player = e.getPlayer();
         Location location = player.getLocation();
-        for(Entity entity : location.getChunk().getEntities()) {
-            if(location.distanceSquared(entity.getLocation()) < (2*2)) {
-                if(entity.getType().equals(EntityType.ARMOR_STAND) && entity.getCustomName().equals("DETECTIVE'S BOW")) {
-                    if (!(player.getGameMode().equals(GameMode.SPECTATOR)) &&
-                    Manager.getArena(player).getKits().get(player.getUniqueId()).equals(KitType.INNOCENT)) {
-                        ItemStack enchBow = new ItemStack(Material.BOW);
-                        enchBow.addEnchantment(Enchantment.ARROW_INFINITE, 1);
+        if(Manager.isPlaying(player) && Manager.getArena(player).getState().equals(GameState.LIVE)) {
+            for (Entity entity : location.getChunk().getEntities()) {
+                if (location.distanceSquared(entity.getLocation()) < (2 * 2)) {
+                    if (entity.getType().equals(EntityType.ARMOR_STAND) && entity.getCustomName().equals("DETECTIVE'S BOW")) {
+                        if (!(player.getGameMode().equals(GameMode.SPECTATOR)) &&
+                                Manager.getArena(player).getKits().get(player.getUniqueId()).equals(KitType.INNOCENT)) {
+                            ItemStack enchBow = new ItemStack(Material.BOW);
+                            enchBow.addEnchantment(Enchantment.ARROW_INFINITE, 1);
 
-                        Manager.getArena(player).sendTitle(ChatColor.YELLOW + "Bow picked up!", "",
-                                10, 50, 20);
+                            Manager.getArena(player).sendTitle(ChatColor.YELLOW + "Bow picked up!", "",
+                                    10, 50, 20);
 
-                        entity.remove();
-                        player.getInventory().setItem(1, enchBow);
-                        player.getInventory().setItem(9, new ItemStack(Material.ARROW));
+                            entity.remove();
+                            player.getInventory().setItem(1, enchBow);
+                            player.getInventory().setItem(9, new ItemStack(Material.ARROW));
+                        }
                     }
-                }
 
+                }
             }
         }
     }
@@ -183,32 +186,33 @@ public class GameListener implements Listener {
                         cooldown.put(shooter,System.currentTimeMillis() + (5 * 1000));
                     }
                 }
+                e.getProjectile().remove();
             }
         }
     }
 
     @EventHandler
-    public void onInteract(PlayerInteractEvent e) {
-        /* Player player = e.getPlayer();
-        if(Manager.isPlaying(player) && Manager.getArena(player).getState().equals(GameState.LIVE)) {
-            if(Manager.getArena(player).getKits().get(player.getUniqueId()).equals(KitType.INNOCENT)) {
-                if (e.getAction() != Action.LEFT_CLICK_AIR && e.getAction() != Action.LEFT_CLICK_BLOCK &&
-                e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK) {
-                    if (player.getTargetEntity(3).getType().equals(EntityType.ARMOR_STAND) &&
-                            player.getTargetEntity(3).getCustomName().equals("DETECTIVE'S BOW")) {
-                        ItemStack enchBow = new ItemStack(Material.BOW);
-                        enchBow.addEnchantment(Enchantment.ARROW_INFINITE,1);
+    public void onSignClick(PlayerInteractEvent e) {
+        Player player = e.getPlayer();
+        if(e.hasBlock() && e.getClickedBlock().getType().equals(Material.OAK_WALL_SIGN)) {
+            int id = Config.isSign(e.getClickedBlock().getLocation());
 
-                        Manager.getArena(player).sendTitle(ChatColor.YELLOW + "Bow picked up!","",
-                                10,200,20);
+            if(id != -1) {
+                if(Manager.getArena(id).getState().equals(GameState.RECRUITING) ||
+                    Manager.getArena(id).getState().equals(GameState.COUNTDOWN)) {
+                    if(!Manager.getArena(id).getPlayers().contains(player.getUniqueId())){
+                        Manager.getArena(id).addPlayer(player);
 
-                        player.getTargetEntity(3).remove();
-                        player.getInventory().setItem(1,enchBow);
-                        player.getInventory().setItem(9,new ItemStack(Material.ARROW));
+                        player.sendMessage(ChatColor.GREEN + "You are now playing in murder mystery, arena " + id + "!");
+                    } else {
+                        player.sendMessage(ChatColor.RED + "You are already in this game!");
                     }
                 }
+
+                e.setCancelled(true);
             }
-        } */
+        }
+
     }
 
     @EventHandler

@@ -18,6 +18,7 @@ public class Countdown extends BukkitRunnable {
         arena.setState(GameState.COUNTDOWN);
         this.runTaskTimer(Main.getInstance(),0,20);
 
+        arena.updateSign(ChatColor.RED + "Murder Mystery",ChatColor.WHITE + "Arena" + arena.getID(),ChatColor.GREEN + "[COUNTDOWN]",ChatColor.GRAY + "Click to join!");
     }
 
     @Override
@@ -40,6 +41,8 @@ public class Countdown extends BukkitRunnable {
             cancel();
             arena.setState(GameState.RECRUITING);
             arena.sendMessage(ChatColor.RED + "Waiting for more players.");
+
+            arena.updateSign(ChatColor.RED + "Murder Mystery",ChatColor.WHITE + "Arena" + arena.getID(),ChatColor.GREEN + "[RECRUITING]",ChatColor.GRAY + "Click to join!");
             return;
         }
 

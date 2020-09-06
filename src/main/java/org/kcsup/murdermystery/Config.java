@@ -31,17 +31,48 @@ public class Config {
     }
 
     public static Location getArenaSpawn(int id) {
-        World world = Bukkit.createWorld(new WorldCreator(main.getConfig().getString("arenas." + id + ".world")));
+        World world = Bukkit.createWorld(new WorldCreator(main.getConfig().getString("arenas." + id + ".spawn.world")));
         world.setAutoSave(false);
 
         return new Location(
                 world,
-                main.getConfig().getDouble("arenas." + id + ".x"),
-                main.getConfig().getDouble("arenas." + id + ".y"),
-                main.getConfig().getDouble("arenas." + id + ".z"),
-                main.getConfig().getInt("arenas." + id + ".yaw"),
-                main.getConfig().getInt("arenas." + id + ".pitch"));
+                main.getConfig().getDouble("arenas." + id + ".spawn.x"),
+                main.getConfig().getDouble("arenas." + id + ".spawn.y"),
+                main.getConfig().getDouble("arenas." + id + ".spawn.z"),
+                main.getConfig().getInt("arenas." + id + ".spawn.yaw"),
+                main.getConfig().getInt("arenas." + id + ".spawn.pitch"));
     }
 
     public static int getArenaAmount() { return main.getConfig().getConfigurationSection("arenas.").getKeys(false).size(); }
+
+    public static Location getArenaGameSpawn(int id) {
+
+        return new Location(
+                Bukkit.getWorld(main.getConfig().getString("arenas." + id + ".game-spawn.world")),
+                main.getConfig().getDouble("arenas." + id + ".game-spawn.x"),
+                main.getConfig().getDouble("arenas." + id + ".game-spawn.y"),
+                main.getConfig().getDouble("arenas." + id + ".game-spawn.z"),
+                main.getConfig().getInt("arenas." + id + ".game-spawn.yaw"),
+                main.getConfig().getInt("arenas." + id + ".game-spawn.pitch"));
+    }
+
+    public static Location getArenaSign(int id) {
+
+        return new Location(
+                Bukkit.getWorld(main.getConfig().getString("arenas." + id + ".sign.world")),
+                main.getConfig().getDouble("arenas." + id + ".sign.x"),
+                main.getConfig().getDouble("arenas." + id + ".sign.y"),
+                main.getConfig().getDouble("arenas." + id + ".sign.z"));
+    }
+
+    public static int isSign(Location location) {
+        for (int i = 0; i < getArenaAmount(); i++) {
+            if(getArenaSign(i).equals(location)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
 }

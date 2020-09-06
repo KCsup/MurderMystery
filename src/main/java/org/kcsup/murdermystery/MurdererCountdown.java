@@ -40,7 +40,7 @@ public class MurdererCountdown extends BukkitRunnable {
             }
         }
 
-        /* if(arena.getState().equals(GameState.LIVE)) {
+         /* if(arena.getState().equals(GameState.LIVE)) {
             if (!(arena.getPlayers().contains(Game.uuidMurderer))) {
                 return;
             }

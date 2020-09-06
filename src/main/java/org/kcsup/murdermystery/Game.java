@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerItemDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.kcsup.murdermystery.kits.KitType;
 
 import java.util.*;
@@ -18,15 +19,18 @@ public class Game {
     public HashMap<UUID, Integer> kills;
     public static UUID uuidDetective;
     public static UUID uuidMurderer;
+    private Location gameSpawn;
 
     public Game(Arena arena) {
         this.arena = arena;
         this.kills = new HashMap<>();
+        gameSpawn = Config.getArenaGameSpawn(arena.getID());
     }
 
     public void start() {
         for (UUID uuid : arena.getPlayers()) {
             Manager.getArena(arena.getID()).setKit(uuid, KitType.INNOCENT);
+            Bukkit.getPlayer(uuid).teleport(gameSpawn);
         }
 
         Random random = new Random();
@@ -46,6 +50,8 @@ public class Game {
         Manager.getArena(arena.getID()).setKit(uuidDetective,KitType.DETECTIVE);
 
         arena.setState(GameState.LIVE);
+
+        arena.updateSign(ChatColor.RED + "Murder Mystery",ChatColor.WHITE + "Arena" + arena.getID(),ChatColor.DARK_RED + "[LIVE]",ChatColor.GRAY + "Players: " + arena.getPlayers().size());
 
         for(UUID uuid : arena.getKits().keySet()) {
             arena.getKits().get(uuid).onStart(Bukkit.getPlayer(uuid));

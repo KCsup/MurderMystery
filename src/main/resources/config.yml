@@ -2,24 +2,30 @@
 required-players: 2
 countdown-seconds: 30
 lobby-spawn:
-  world: 'world'
-  x: 157
-  y: 84
-  z: -147
+  world: 'MM'
+  x: 2
+  y: 69
+  z: -4
   pitch: 0
-  yaw: -90
+  yaw: -180
 arenas:
   '0':
-    world: 'world'
-    x: 181
-    y: 87
-    z: -163
-    pitch: 0
-    yaw: 180
-  '1':
-    world: 'world'
-    x: 100
-    y: 100
-    z: 100
-    pitch: 60
-    yaw: 60
+    sign:
+      world: 'World'
+      x: 18
+      y: 142
+      z: 258
+    spawn:
+      world: 'MMarena1'
+      x: 0
+      y: 120
+      z: 0
+      pitch: 0
+      yaw: -90
+    game-spawn:
+      world: 'MMarena1'
+      x: 10
+      y: 65
+      z: 0
+      pitch: 0
+      yaw: -90

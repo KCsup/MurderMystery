@@ -1,11 +1,15 @@
 package org.kcsup.murdermystery;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.kcsup.murdermystery.kits.KitType;
 
+import javax.swing.text.SimpleAttributeSet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +21,7 @@ public class Arena {
     private ArrayList<UUID> players;
     private HashMap<UUID, KitType> kits;
     private Location spawn;
+
     private GameState state;
     private Countdown countdown;
     private MurdererCountdown murdererCountdown;
@@ -35,6 +40,8 @@ public class Arena {
         game = new Game(this);
 
         canJoin = true;
+
+        updateSign(ChatColor.RED + "Murder Mystery",ChatColor.WHITE + "Arena" + id,ChatColor.GREEN + "[RECRUITING]",ChatColor.GRAY + "Click to join!");
     }
 
     public void start() {
@@ -51,6 +58,7 @@ public class Arena {
             restoreGameMode(Bukkit.getPlayer(uuid));
             game.kills.keySet().clear();
 
+            updateSign(ChatColor.RED + "Murder Mystery",ChatColor.WHITE + "Arena" + id,ChatColor.GREEN + "[RECRUITING]",ChatColor.GRAY + "Click to join!");
         }
 
         state = GameState.RECRUITING;
@@ -123,6 +131,11 @@ public class Arena {
 
         sendMessage(ChatColor.GREEN + player.getName() + " has quit!");
 
+        if(state.equals(GameState.LIVE)) {
+            updateSign(ChatColor.RED + "Murder Mystery",ChatColor.WHITE + "Arena" + id,ChatColor.DARK_RED + "[LIVE]",ChatColor.GRAY + "Players: " + players.size());
+
+        }
+
         if (players.size() <= Config.getRequiredPlayers() && state.equals(GameState.COUNTDOWN)) {
             resetCountdown();
         }
@@ -130,6 +143,22 @@ public class Arena {
         if (players.size() == 0 && state.equals(GameState.LIVE) || players.size() == 1 && state.equals(GameState.LIVE)) {
             reset();
         }
+    }
+
+    public void updateSign(String line1, String line2, String line3, String line4) {
+        Location sign = Config.getArenaSign(id);
+        // sign.getWorld().getBlockAt((int) sign.getX(),(int) sign.getY(),(int) sign.getZ()).getState().getData();
+        World w = sign.getWorld();
+        Block b = w.getBlockAt(sign);
+        if(b.getType() == Material.OAK_WALL_SIGN) {
+            org.bukkit.block.Sign wallSign = (org.bukkit.block.Sign) b.getState();
+            wallSign.setLine(0, line1);
+            wallSign.setLine(1, line2);
+            wallSign.setLine(2, line3);
+            wallSign.setLine(3, line4);
+            wallSign.update();
+        }
+
     }
 
     public int getID() {
